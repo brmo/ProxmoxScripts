@@ -296,15 +296,13 @@ function advanced_settings() {
   if IPADDR1=$(whiptail --backtitle "Proxmox VE Helper Scripts" --inputbox "Set a IP Address" 8 58 --title "IPADDR" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
       IPADDR="=$IPADDR1"
       echo -e "${DGN}Using IP: ${BGN}$IPADDR${CL}"
-    fi
   else
     exit-script
   fi
 
-  if IPGATEWAY1=$(whiptail --backtitle "Proxmox VE Helper Scripts" --inputbox "Set a IP Address" 8 58 --title "IPADDR" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
+  if IPGATEWAY1=$(whiptail --backtitle "Proxmox VE Helper Scripts" --inputbox "Set a IP Gateway" 8 58 --title "IPGATEWAY" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
       IPGATEWAY="=$IPGATEWAY1"
       echo -e "${DGN}Using Gateway: ${BGN}$IPGATEWAY${CL}"
-    fi
   else
     exit-script
   fi
@@ -392,7 +390,7 @@ FILENANE=debian-12-genericcloud-amd64-20240211-1654.qcow2
 CHKSUM=6856277491c234fa1bc6f250cbd9f0d44f77524479536ecbc0ac536bc07e76322ebb4d42e09605056d6d3879c8eb87db40690a2b5dfe57cb19b0c673fc4c58ca
 if [ -f $FILENAME ]; then
   echo "File exists already, checking checksum"
-  if [ sha512sum $FILENAME == ${CHKSUM}]; then
+  if [ sha512sum ${FILENAME} | awk '{print $1}' == ${CHKSUM}]; then
     echo "File passes! No need to download again"
   else
     wget -q --show-progress $URL

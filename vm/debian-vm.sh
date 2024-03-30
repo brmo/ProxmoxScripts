@@ -293,6 +293,22 @@ function advanced_settings() {
     exit-script
   fi
 
+  if IPADDR1=$(whiptail --backtitle "Proxmox VE Helper Scripts" --inputbox "Set a IP Address" 8 58 --title "IPADDR" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
+      IPADDR="=$IPADDR1"
+      echo -e "${DGN}Using IP: ${BGN}$IPADDR${CL}"
+    fi
+  else
+    exit-script
+  fi
+
+  if IPGATEWAY1=$(whiptail --backtitle "Proxmox VE Helper Scripts" --inputbox "Set a IP Address" 8 58 --title "IPADDR" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
+      IPGATEWAY="=$IPGATEWAY1"
+      echo -e "${DGN}Using Gateway: ${BGN}$IPGATEWAY${CL}"
+    fi
+  else
+    exit-script
+  fi
+
   if MTU1=$(whiptail --backtitle "Proxmox VE Helper Scripts" --inputbox "Set Interface MTU Size (leave blank for default)" 8 58 --title "MTU SIZE" --cancel-button Exit-Script 3>&1 1>&2 2>&3); then
     if [ -z $MTU1 ]; then
       MTU1="Default"
@@ -372,11 +388,11 @@ msg_ok "Using ${CL}${BL}$STORAGE${CL} ${GN}for Storage Location."
 msg_ok "Virtual Machine ID is ${CL}${BL}$VMID${CL}."
 msg_info "Retrieving the URL for the Debian 12 Qcow2 Disk Image"
 URL=https://cloud.debian.org/images/cloud/bookworm/20240211-1654/debian-12-genericcloud-amd64-20240211-1654.qcow2
-FILE=debian-12-genericcloud-amd64-20240211-1654.qcow2
+FILENANE=debian-12-genericcloud-amd64-20240211-1654.qcow2
 CHKSUM=6856277491c234fa1bc6f250cbd9f0d44f77524479536ecbc0ac536bc07e76322ebb4d42e09605056d6d3879c8eb87db40690a2b5dfe57cb19b0c673fc4c58ca
-if [ -f $FILE ]; then
+if [ -f $FILENAME ]; then
   echo "File exists already, checking checksum"
-  if [ sha512sum $FILE == ${CHKSUM}]; then
+  if [ sha512sum $FILENAME == ${CHKSUM}]; then
     echo "File passes! No need to download again"
   else
     wget -q --show-progress $URL
@@ -426,6 +442,9 @@ qm set $VMID \
   -boot order=scsi0 \
   -serial0 socket \
    >/dev/null
+
+qm set $VMID \
+  --ipconfig0 ip=${IPADDR},gw=${IPGATEWAY}
    
 msg_ok "Created a Debian 12 VM ${CL}${BL}(${HN})"
 if [ "$START_VM" == "yes" ]; then

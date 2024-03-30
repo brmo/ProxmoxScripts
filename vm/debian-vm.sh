@@ -374,9 +374,20 @@ msg_info "Retrieving the URL for the Debian 12 Qcow2 Disk Image"
 URL=https://cloud.debian.org/images/cloud/bookworm/20240211-1654/debian-12-genericcloud-amd64-20240211-1654.qcow2
 FILE=debian-12-genericcloud-amd64-20240211-1654.qcow2
 CHKSUM=6856277491c234fa1bc6f250cbd9f0d44f77524479536ecbc0ac536bc07e76322ebb4d42e09605056d6d3879c8eb87db40690a2b5dfe57cb19b0c673fc4c58ca
+if [ -f $FILE ]; then
+  echo "File exists already, checking checksum"
+  if [ sha512sum $FILE == ${CHKSUM}]; then
+    echo "File passes! No need to download again"
+  else
+    wget -q --show-progress $URL
+  fi
+else
+  wget -q --show-progress $URL
+fi
+
 sleep 2
 msg_ok "${CL}${BL}${URL}${CL}"
-wget -q --show-progress $URL
+
 echo -en "\e[1A\e[0K"
 FILE=$(basename $URL)
 msg_ok "Downloaded ${CL}${BL}${FILE}${CL}"
